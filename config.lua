@@ -23,5 +23,5 @@ Config.RedZone = {
 Config.Notify = {
     ["no_vehicle"]       = "~r~You cannot use vehicles in this RedZone!",
     ["on_weapon_change"] = "~r~You can't use other weapons!",
-    ["no_weapon"] = "~r~You don't have the weapon to be able to play in this RedZone, so you won't be able to shoot!",
+    ["no_weapon"]        = "~r~You don't have the weapon to be able to play in this RedZone, so you won't be able to shoot!",
 }
