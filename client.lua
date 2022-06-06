@@ -2,6 +2,7 @@ DevMode(false)
 
 local options = {
     rgb = {255, 0, 0},
+    slice = "ignore"
 }
 
 Citizen.CreateThread(function()
@@ -27,19 +28,15 @@ CreateLoop(function()
 
     for marker_id,v in pairs(Config.RedZone) do 
         if GetDistanceFrom("marker", marker_id) < v.Size/2 then
-            LoopThread("playerped", 500, function()
-                ped = PlayerPedId()
-            end)
+            ped = PlayerPedId()
 
             if not v.CanUseVehicle then
-                LoopThread("vehicle_check", 1000, function()
-                    local veh = GetVehiclePedIsIn(ped)
-    
-                    if veh ~= 0 then
-                        DeleteEntity(veh)
-                        ShowNotification(Config.Notify["no_vehicle"])
-                    end
-                end)
+                local veh = GetVehiclePedIsIn(ped)
+
+                if veh ~= 0 then
+                    DeleteEntity(veh)
+                    ShowNotification(Config.Notify["no_vehicle"])
+                end
             end
     
             if v.NoHs then
@@ -49,23 +46,21 @@ CreateLoop(function()
             end
 
             if v.Weapon ~= "" then
-                LoopThread("weapon", 500, function()
-                    if v.UnlimitedAmmo then
-                        SetPedInfiniteAmmoClip(ped, true)
+                if v.UnlimitedAmmo then
+                    SetPedInfiniteAmmoClip(ped, true)
+                else
+                    SetPedInfiniteAmmoClip(ped, false)
+                end
+
+                if GetSelectedPedWeapon(ped) ~= v.Weapon then
+                    if HasPedGotWeapon(ped, v.Weapon, false) then
+                        ShowNotification(Config.Notify["on_weapon_change"])
+                        SetCurrentPedWeapon(ped, v.Weapon, true)
                     else
-                        SetPedInfiniteAmmoClip(ped, false)
+                        ShowNotification(Config.Notify["no_weapon"])
+                        GiveWeaponToPed(ped, v.Weapon, 250, false, true)
                     end
-    
-                    if GetSelectedPedWeapon(ped) ~= v.Weapon then
-                        if HasPedGotWeapon(ped, v.Weapon, false) then
-                            ShowNotification(Config.Notify["on_weapon_change"])
-                            SetCurrentPedWeapon(ped, v.Weapon, true)
-                        else
-                            ShowNotification(Config.Notify["no_weapon"])
-                            GiveWeaponToPed(ped, v.Weapon, 250, false, true)
-                        end
-                    end
-                end)
+                end
             end
     
             if v.OnlyHS then
